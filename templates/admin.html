@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Админ‑панель{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <div>
+        <h1 class="h4 fw-bold mb-0">Админ‑панель</h1>
+        <div class="text-muted small">Сегодня: {{ weekday_today_name }} ({{ today_date }})</div>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('index') }}">Главная</a>
+        <form method="post" action="{{ url_for('admin_logout') }}">
+          <button class="btn btn-outline-danger btn-sm" type="submit">Выйти</button>
+        </form>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="mb-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} mb-2" role="alert">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-7">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+              <div class="fw-bold accent-title">Расписание (по дням недели)</div>
+              <div class="text-muted small">Формат времени: HH:MM</div>
+            </div>
+
+            <form method="post" action="{{ url_for('admin_update_schedule') }}">
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr class="text-muted small">
+                      <th class="accent-title">День</th>
+                      <th class="text-center accent-title">Открыто</th>
+                      <th class="accent-title">Начало</th>
+                      <th class="accent-title">Конец</th>
+                      <th class="accent-title">Лимит</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for s in schedules %}
+                      <tr {% if s.weekday == weekday_today %}class="table-light"{% endif %}>
+                        <td class="fw-semibold accent-title">{{ weekdays_ru[s.weekday] }}</td>
+                        <td class="text-center">
+                          <input class="form-check-input" type="checkbox" name="is_open_{{ s.weekday }}" {% if s.is_open %}checked{% endif %} />
+                        </td>
+                        <td style="max-width: 120px;">
+                          <input class="form-control form-control-sm" name="start_time_{{ s.weekday }}" value="{{ s.start_time }}" />
+                        </td>
+                        <td style="max-width: 120px;">
+                          <input class="form-control form-control-sm" name="end_time_{{ s.weekday }}" value="{{ s.end_time }}" />
+                        </td>
+                        <td style="max-width: 120px;">
+                          <input class="form-control form-control-sm" name="max_seats_{{ s.weekday }}" value="{{ s.max_seats }}" inputmode="numeric" />
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+
+              <button class="btn btn-primary w-100 fw-semibold" type="submit">Сохранить расписание</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4 mb-3">
+          <div class="card-body p-4">
+            <div class="fw-bold mb-2 accent-title">Статус на сегодня</div>
+            {% if today_schedule.is_open %}
+              <div class="text-muted small mb-2">{{ weekday_today_name }} с {{ today_schedule.start_time }} до {{ today_schedule.end_time }}.</div>
+              {% if seats_left > 0 %}
+                <div class="alert alert-success text-center fw-semibold py-2 mb-0">Осталось {{ seats_left }} мест</div>
+              {% else %}
+                <div class="alert alert-danger text-center fw-semibold py-2 mb-0">Мест больше нет</div>
+              {% endif %}
+            {% else %}
+              <div class="alert alert-secondary text-center fw-semibold py-2 mb-0">Запись закрыта</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+              <div class="fw-bold">Заявки за сегодня</div>
+              <div class="text-muted small">{{ today_bookings|length }} шт.</div>
+            </div>
+
+            {% if today_bookings|length == 0 %}
+              <div class="text-muted">Пока нет записей.</div>
+            {% else %}
+              <div class="list-group">
+                {% for b in today_bookings %}
+                  <div class="list-group-item">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                      <div>
+                        <div class="fw-semibold">{{ b["student_name"] }}</div>
+                        <div class="text-muted small">
+                          Родитель: {{ b["parent_name"] }} · Тел: {{ b["parent_phone"] }}
+                          {% if b["group_number"] %}· Группа: {{ b["group_number"] }}{% endif %}
+                        </div>
+                        <div class="text-muted small">Создано: {{ b["created_at"] }}</div>
+                      </div>
+                      <form method="post" action="{{ url_for('admin_delete_booking', booking_id=b['id']) }}">
+                        <button class="btn btn-outline-danger btn-sm" type="submit">Удалить</button>
+                      </form>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

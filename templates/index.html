@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Запись{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+              <h1 class="h3 fw-bold mb-2 main-title">Запись на выполнение домашних заданий</h1>
+              <div class="text-muted small">
+                {% if schedule.is_open %}
+                  <div class="fw-semibold">{{ weekday_name }} с {{ schedule.start_time }} до {{ schedule.end_time }}.</div>
+                  <div>Максимум {{ schedule.max_seats }} мест.</div>
+                {% else %}
+                  <div class="fw-semibold">Сегодня записи нет.</div>
+                {% endif %}
+              </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="mb-3">
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-2" role="alert">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            {% if schedule.is_open and seats_left > 0 %}
+              <div class="alert alert-success text-center fw-semibold py-2">Осталось {{ seats_left }} мест</div>
+            {% elif schedule.is_open and seats_left == 0 %}
+              <div class="alert alert-danger text-center fw-semibold py-2">Мест больше нет</div>
+            {% else %}
+              <div class="alert alert-secondary text-center fw-semibold py-2">Запись закрыта</div>
+            {% endif %}
+
+            <form method="post" class="mt-4">
+              <div class="mb-3">
+                <label class="form-label">Фамилия Имя студента <span class="text-danger">*</span></label>
+                <input name="student_name" class="form-control" placeholder="Например: Иванов Иван" required />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Фамилия Имя родителя <span class="text-danger">*</span></label>
+                <input name="parent_name" class="form-control" placeholder="Например: Иванова Мария" required />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Номер группы</label>
+                <input name="group_number" class="form-control" placeholder="Например: 10-А" />
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label">Телефон родителя <span class="text-danger">*</span></label>
+                <input name="parent_phone" class="form-control" placeholder="+7 999 123-45-67" required />
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit" {% if (not schedule.is_open) or seats_left==0 %}disabled{% endif %}>
+                Записаться
+              </button>
+            </form>
+
+            <div class="text-center mt-3">
+              <a class="small text-decoration-none" href="{{ url_for('admin_dashboard') }}">Админ‑панель</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

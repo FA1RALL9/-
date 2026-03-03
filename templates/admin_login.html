@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Админ‑вход{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4">
+            <h1 class="h4 fw-bold mb-3 text-center">Админ‑панель</h1>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="mb-3">
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mb-2" role="alert">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <form method="post">
+              <div class="mb-3">
+                <label class="form-label">Логин</label>
+                <input name="user" class="form-control" autocomplete="username" required />
+              </div>
+              <div class="mb-4">
+                <label class="form-label">Пароль</label>
+                <input name="password" type="password" class="form-control" autocomplete="current-password" required />
+              </div>
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">Войти</button>
+            </form>
+
+            <div class="text-center mt-3">
+              <a class="small text-decoration-none" href="{{ url_for('index') }}">На главную</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,321 @@
+:root {
+  --bg-0: #070712;
+  --bg-1: #0b0a1a;
+  --stroke: rgba(255, 255, 255, 0.12);
+  --stroke-2: rgba(255, 255, 255, 0.18);
+
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.62);
+
+  --neon-pink: #ff4fd8;
+  --neon-purple: #8a5cff;
+  --neon-cyan: #33d8ff;
+  --neon-green: #4dffb5;
+
+  --radius: 1.15rem;
+  --radius-sm: 0.85rem;
+  --shadow-neon: 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 12px 32px rgba(0, 0, 0, 0.55),
+    0 0 38px rgba(255, 79, 216, 0.18);
+}
+
+/* Fonts: keep all design in CSS */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap");
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: var(--text);
+  font-feature-settings: "liga" 1, "kern" 1;
+  background-color: var(--bg-0) !important;
+  overflow-x: hidden;
+}
+
+/* Kill Bootstrap light background without touching HTML */
+body.bg-light {
+  background-color: var(--bg-0) !important;
+}
+
+/* Cyber background: gradients + subtle image overlay (optional, from internet) */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+}
+
+body::before {
+  background:
+    radial-gradient(1200px 700px at 20% 10%, rgba(255, 79, 216, 0.18), transparent 58%),
+    radial-gradient(900px 650px at 85% 20%, rgba(51, 216, 255, 0.14), transparent 60%),
+    radial-gradient(900px 650px at 55% 95%, rgba(138, 92, 255, 0.14), transparent 60%),
+    linear-gradient(180deg, var(--bg-1), var(--bg-0) 60%);
+}
+
+body::after {
+  z-index: -1;
+  background-image:
+    /* grid */
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    /* soft noise */
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.06), transparent 40%),
+    /* optional backdrop image */
+    url("https://images.unsplash.com/photo-1520975958221-5d2f92f6c2bb?auto=format&fit=crop&w=1920&q=65");
+  background-size: 56px 56px, 56px 56px, 1400px 900px, cover;
+  background-position: center, center, center, center;
+  background-repeat: repeat, repeat, no-repeat, no-repeat;
+  background-blend-mode: overlay, overlay, screen, soft-light;
+  opacity: 0.22;
+  filter: saturate(1.15) contrast(1.05);
+  transform: translateZ(0);
+}
+
+main.py-5 {
+  padding-top: 3.25rem !important;
+  padding-bottom: 3.25rem !important;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+.h1,
+.h2,
+.h3,
+.h4 {
+  font-family: Orbitron, Inter, system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.main-title {
+  color: #ffffff;
+}
+
+.accent-title {
+  color: #ffffff !important;
+}
+
+.text-muted {
+  color: var(--muted) !important;
+}
+
+/* Cards: glass + neon edge */
+.card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)) !important;
+  border: 1px solid var(--stroke) !important;
+  box-shadow: var(--shadow-neon);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.card.rounded-4 {
+  border-radius: var(--radius) !important;
+}
+
+.card .card-body {
+  position: relative;
+}
+
+/* Subtle animated “scanline” overlay on cards */
+.card .card-body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.045) 18%,
+      transparent 36%,
+      rgba(255, 255, 255, 0.035) 54%,
+      transparent 72%,
+      rgba(255, 255, 255, 0.03) 90%,
+      transparent 100%
+    );
+  opacity: 0.28;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  animation: scan 8s linear infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-18%);
+  }
+  100% {
+    transform: translateY(18%);
+  }
+}
+
+/* Inputs */
+.form-label {
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 600;
+}
+
+.form-control,
+.form-select {
+  color: var(--text) !important;
+  background: rgba(10, 10, 24, 0.55) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba(51, 216, 255, 0.65) !important;
+  box-shadow:
+    0 0 0 0.2rem rgba(51, 216, 255, 0.12),
+    0 0 22px rgba(51, 216, 255, 0.12) !important;
+}
+
+.form-check-input {
+  background-color: rgba(10, 10, 24, 0.55);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.form-check-input:checked {
+  background-color: var(--neon-cyan);
+  border-color: rgba(51, 216, 255, 0.85);
+  box-shadow: 0 0 18px rgba(51, 216, 255, 0.22);
+}
+
+/* Buttons */
+.btn {
+  border-radius: calc(var(--radius-sm) + 0.1rem);
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease, background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(51, 216, 255, 0.18) !important;
+}
+
+.btn-primary {
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: linear-gradient(90deg, rgba(255, 79, 216, 0.92), rgba(51, 216, 255, 0.92)) !important;
+  box-shadow: 0 10px 30px rgba(255, 79, 216, 0.16), 0 10px 30px rgba(51, 216, 255, 0.12);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05) saturate(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 42px rgba(255, 79, 216, 0.18), 0 14px 42px rgba(51, 216, 255, 0.14);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  filter: saturate(0.6);
+}
+
+.btn-outline-secondary {
+  color: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(10, 10, 24, 0.22);
+}
+
+.btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(255, 61, 90, 0.45) !important;
+  background: rgba(255, 61, 90, 0.08);
+}
+
+.btn-outline-danger:hover {
+  background: rgba(255, 61, 90, 0.18);
+  border-color: rgba(255, 61, 90, 0.62) !important;
+  transform: translateY(-1px);
+}
+
+/* Alerts (status ribbons) */
+.alert {
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: var(--radius-sm);
+}
+
+.alert-success {
+  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(90deg, rgba(77, 255, 181, 0.16), rgba(51, 216, 255, 0.12));
+  border-color: rgba(77, 255, 181, 0.22);
+  box-shadow: 0 0 26px rgba(77, 255, 181, 0.08);
+}
+
+.alert-danger {
+  color: rgba(255, 255, 255, 0.92);
+  background: linear-gradient(90deg, rgba(255, 61, 90, 0.18), rgba(138, 92, 255, 0.10));
+  border-color: rgba(255, 61, 90, 0.26);
+  box-shadow: 0 0 26px rgba(255, 61, 90, 0.08);
+}
+
+.alert-secondary {
+  color: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Tables (admin) */
+.table {
+  color: rgba(255, 255, 255, 0.9);
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.04);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.06);
+  --bs-table-border-color: rgba(255, 255, 255, 0.10);
+}
+
+.table thead th {
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+}
+
+.table-light {
+  --bs-table-bg: rgba(51, 216, 255, 0.06);
+}
+
+/* List group */
+.list-group-item {
+  background: rgba(10, 10, 24, 0.40) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Links */
+a {
+  color: rgba(51, 216, 255, 0.92);
+}
+
+a:hover {
+  color: rgba(255, 79, 216, 0.92);
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none !important;
+  }
+  .card .card-body::before {
+    animation: none !important;
+  }
+}
