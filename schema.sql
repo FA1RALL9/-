@@ -19,3 +19,4 @@ CREATE TABLE IF NOT EXISTS bookings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_bookings_date_phone ON bookings(booking_date, parent_phone);

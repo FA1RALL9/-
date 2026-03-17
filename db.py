@@ -47,6 +47,7 @@ def init_db() -> None:
     schema = (Path(__file__).resolve().parent / "schema.sql").read_text(encoding="utf-8")
     conn.executescript(schema)
     _ensure_default_schedule(conn)
+    _ensure_indexes(conn)
     conn.commit()
     conn.close()
 
@@ -63,6 +64,13 @@ def _ensure_default_schedule(conn: sqlite3.Connection) -> None:
             """,
             (weekday,),
         )
+
+
+def _ensure_indexes(conn: sqlite3.Connection) -> None:
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);")
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_bookings_date_phone ON bookings(booking_date, parent_phone);"
+    )
 
 
 def query_one(sql: str, params: Iterable[Any] = ()) -> sqlite3.Row | None:

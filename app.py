@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 import secrets
+import sqlite3
 from dataclasses import dataclass
 from datetime import date, datetime
 from functools import wraps
@@ -73,7 +74,7 @@ def create_app() -> Flask:
                 flash("Телефон выглядит некорректно. Пример: +7 999 123-45-67", "danger")
                 return redirect(url_for("index"))
 
-            ok = try_create_booking(
+            ok, reason = try_create_booking(
                 booking_date=today.isoformat(),
                 student_name=student_name,
                 parent_name=parent_name,
@@ -83,6 +84,8 @@ def create_app() -> Flask:
             )
             if ok:
                 flash("Вы успешно записаны.", "success")
+            elif reason == "duplicate":
+                flash("Вы уже записаны на сегодня.", "danger")
             else:
                 flash("Мест больше нет.", "danger")
             return redirect(url_for("index"))
@@ -239,7 +242,7 @@ def try_create_booking(
     group_number: str | None,
     parent_phone: str,
     max_seats: int,
-) -> bool:
+) -> tuple[bool, str]:
     db = get_db()
     db.execute("BEGIN IMMEDIATE;")
     taken_row = db.execute(
@@ -249,24 +252,28 @@ def try_create_booking(
     taken = int(taken_row["c"]) if taken_row else 0
     if taken >= max_seats:
         db.execute("ROLLBACK;")
-        return False
+        return False, "no_seats"
 
-    db.execute(
-        """
-        INSERT INTO bookings (booking_date, created_at, student_name, parent_name, group_number, parent_phone)
-        VALUES (?, ?, ?, ?, ?, ?);
-        """,
-        (
-            booking_date,
-            datetime.now().isoformat(timespec="seconds"),
-            student_name,
-            parent_name,
-            group_number,
-            parent_phone,
-        ),
-    )
-    db.execute("COMMIT;")
-    return True
+    try:
+        db.execute(
+            """
+            INSERT INTO bookings (booking_date, created_at, student_name, parent_name, group_number, parent_phone)
+            VALUES (?, ?, ?, ?, ?, ?);
+            """,
+            (
+                booking_date,
+                datetime.now().isoformat(timespec="seconds"),
+                student_name,
+                parent_name,
+                group_number,
+                parent_phone,
+            ),
+        )
+        db.execute("COMMIT;")
+        return True, "ok"
+    except sqlite3.IntegrityError:
+        db.execute("ROLLBACK;")
+        return False, "duplicate"
 
 
 def cleanup_old_bookings() -> None:
